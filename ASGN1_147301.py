@@ -60,8 +60,6 @@ class Food_Finder:
         #store the accepted words
         if current_state in self.final_states and input_text not in self.accepted_list:
             self.accepted_list.append(input_text)
-
-        print(self.accepted_list)
         
 #create a window for visualization purpose
 class Window:
@@ -169,23 +167,36 @@ class Window:
             #get the occurrence and position of each food found
             for food in accepted_list:
                 #get the position of the food
-                pos = self.text_box.search(food, "1.0", END)
-                end_pos = self.text_box.index("%s+ %dc" % (pos, len(food)))
+                positions = self.find_all(food)
 
                 #configure a tag for boldface
                 bold_font = font.Font(font=self.text_box["font"])
                 bold_font.configure(weight='bold')
                 self.text_box.tag_configure("bold", font=bold_font)
                 #bold the food
-                self.text_box.tag_add("bold", pos, end_pos)
+                for pos, end_pos in positions:
+                    self.text_box.tag_add("bold", pos, end_pos)
                 
                 #get the occurrence of food
-                occurrence = self.text_box.get("1.0", END).count(food)
+                occurrence = self.input_tokens.count(food)
                 food_occ = food + "\t" + str(occurrence) + "\n" #display the occurrence with food
                 self.foods_found.insert(END, food_occ)
                 
         self.foods_found.config(state=DISABLED)
         self.status_label["text"] = "Status: " + status #display the status: accepted/rejected
+
+    #function to find all the position of food
+    def find_all(self, food):
+        start = '1.0'
+        positions = []
+        while True:
+            start = self.text_box.search(food, start, END, nocase=1)
+            if not start:
+                break
+            end = '{}+{}c'.format(start, len(food))
+            positions.append((start, end))
+            start = end
+        return positions
 
 if __name__ == "__main__":
     root = Tk()

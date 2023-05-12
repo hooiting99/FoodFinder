@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import font
+import nltk
 from nltk.tokenize import word_tokenize, MWETokenizer
+nltk.download('punkt')
 
 #create a DFA that accept L(food)
 class Food_Finder:
@@ -34,9 +36,6 @@ class Food_Finder:
 
                 if counter == len(food):
                     self.final_states.append(current_state)#store the final state
-        # print(self.states)
-        # print(self.final_states)
-        # print(self.dfa)
 
         #link the no transition alphabets to trap state
         for state in self.states:
@@ -44,7 +43,6 @@ class Food_Finder:
                 if alpha not in self.dfa[state]:
                     next_state = self.trap_state
                     self.dfa[state][alpha] = next_state
-        print(self.dfa)
 
     #check if the input string is food
     def verify_food(self, input_text):
@@ -65,7 +63,7 @@ class Food_Finder:
 class Window:
     def __init__(self, master):
         self.master = master
-        self.master.title("Food Finder using DFA")
+        self.master.title("DFA Food Finder")
         self.master.geometry("800x400") #set window's starting size
         self.master.resizable(False, False) #size of window
         self.master.config(bg="lightgrey") #bg color
@@ -141,13 +139,11 @@ class Window:
 
                 #tokenize the text file into words
                 tokenizer = MWETokenizer([], ' ')
-
+                #tokenize multi words into single token
                 for pattern in self.patterns_list:
                     if len(pattern.split()) > 1:
-                        print(pattern)
                         tokenizer.add_mwe(pattern.split())
                 self.input_tokens = tokenizer.tokenize(word_tokenize(file_contents.lower()))
-                # print(self.input_tokens)
 
     #detect if the text file have foods that macth the food patterns 
     def dfa_detect(self):
